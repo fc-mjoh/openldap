@@ -1,0 +1,128 @@
+@host = localhost:8089
+
+### 1. Benutzer abrufen (200)
+GET http://{{host}}/api/users/alice
+Accept: application/json
+
+> {%
+    client.test("alice gefunden", function () {
+        client.assert(response.status === 200, "Status war " + response.status);
+        client.assert(response.body.username === "alice", "username stimmt nicht");
+        client.assert(response.body.email === "alice@example.com", "email stimmt nicht");
+    });
+%}
+
+### 2. Unbekannter Benutzer (404)
+GET http://{{host}}/api/users/nobody
+Accept: application/json
+
+> {%
+    client.test("404 für unbekannten Benutzer", function () {
+        client.assert(response.status === 404, "Status war " + response.status);
+    });
+%}
+
+### 3. Suche nach Nachname (200, alice und carol)
+GET http://{{host}}/api/users?lastName=Anderson
+Accept: application/json
+
+> {%
+    client.test("zwei Treffer", function () {
+        client.assert(response.status === 200, "Status war " + response.status);
+        client.assert(response.body.length === 2, "Anzahl war " + response.body.length);
+    });
+%}
+
+### 4. Wildcard wird maskiert (200, leere Liste)
+GET http://{{host}}/api/users?lastName=*
+Accept: application/json
+
+> {%
+    client.test("keine Treffer bei *", function () {
+        client.assert(response.status === 200, "Status war " + response.status);
+        client.assert(response.body.length === 0, "Anzahl war " + response.body.length);
+    });
+%}
+
+### 5. Leere Eingabe (400)
+GET http://{{host}}/api/users?lastName=%20
+Accept: application/json
+
+> {%
+    client.test("400 bei leerem Nachnamen", function () {
+        client.assert(response.status === 400, "Status war " + response.status);
+    });
+%}
+
+### 6. Gruppen von alice (200, developers und admins)
+GET http://{{host}}/api/users/alice/groups
+Accept: application/json
+
+> {%
+    client.test("alice ist in zwei Gruppen", function () {
+        client.assert(response.status === 200, "Status war " + response.status);
+        client.assert(response.body.length === 2, "Anzahl war " + response.body.length);
+        client.assert(response.body.includes("developers"), "developers fehlt");
+        client.assert(response.body.includes("admins"), "admins fehlt");
+    });
+%}
+
+### 7. Gruppen von carol (200, leere Liste)
+GET http://{{host}}/api/users/carol/groups
+Accept: application/json
+
+> {%
+    client.test("carol hat keine Gruppen", function () {
+        client.assert(response.status === 200, "Status war " + response.status);
+        client.assert(response.body.length === 0, "Anzahl war " + response.body.length);
+    });
+%}
+
+### 8. Login korrekt (200)
+POST http://{{host}}/api/auth/verify
+Content-Type: application/json
+
+{"username": "alice", "password": "alicepw"}
+
+> {%
+    client.test("Login erfolgreich", function () {
+        client.assert(response.status === 200, "Status war " + response.status);
+        client.assert(response.body.username === "alice", "username stimmt nicht");
+    });
+%}
+
+### 9. Login mit falschem Passwort (401)
+POST http://{{host}}/api/auth/verify
+Content-Type: application/json
+
+{"username": "alice", "password": "falsch"}
+
+> {%
+    client.test("401 bei falschem Passwort", function () {
+        client.assert(response.status === 401, "Status war " + response.status);
+    });
+%}
+
+### 10. Login mit leerem Passwort (401, der Kern weist es ab)
+POST http://{{host}}/api/auth/verify
+Content-Type: application/json
+
+{"username": "alice", "password": ""}
+
+> {%
+    client.test("401 bei leerem Passwort", function () {
+        client.assert(response.status === 401, "Status war " + response.status);
+    });
+%}
+
+### 11. Login mit unbekanntem Benutzer (401)
+POST http://{{host}}/api/auth/verify
+Content-Type: application/json
+
+{"username": "nobody", "password": "irgendwas"}
+
+> {%
+    client.test("401 bei unbekanntem Benutzer", function () {
+        client.assert(response.status === 401, "Status war " + response.status);
+    });
+%}

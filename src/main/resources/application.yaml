@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: ldap-app
+  ldap:
+    urls: ${LDAP_URL:ldap://localhost:389}
+    base: dc=example,dc=com
+    username: ${LDAP_USER:cn=admin,dc=example,dc=com}
+    password: ${LDAP_PASSWORD:adminpass}
+server:
+  port: 8089
