@@ -1,0 +1,24 @@
+services:
+  openldap:
+    image: osixia/openldap:2.6.15-beta
+    container_name: openldap
+    hostname: ldap.example.org
+    ports:
+      - "389:3890"   # LDAP  (im Container 3890)
+      - "636:6360"   # LDAPS (im Container 6360)
+    environment:
+      OPENLDAP_BOOTSTRAP_ORGANIZATION: "Example Org"
+      OPENLDAP_BOOTSTRAP_SUFFIX: "dc=example,dc=com"
+      OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED: ${LDAP_ADMIN_HASH}
+    volumes:
+      - openldap-conf:/etc/openldap/slapd.d
+      - openldap-data:/var/lib/openldap/openldap-data
+      - openldap-backups:/var/lib/openldap/openldap-backups
+      # Beispieldaten, bewusst nicht :ro (Bootstrap konvertiert Templates)
+      - ./ldif/data:/container/services/openldap-bootstrap/assets/ldif/data/custom
+    restart: unless-stopped
+
+volumes:
+  openldap-conf:
+  openldap-data:
+  openldap-backups:

@@ -1,0 +1,55 @@
+dn: ou=people,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: uid=alice,ou=people,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: alice
+cn: Alice Anderson
+sn: Anderson
+mail: alice@example.com
+userPassword: alicepw
+
+dn: uid=bob,ou=people,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: bob
+cn: Bob Baumann
+sn: Baumann
+mail: bob@example.com
+userPassword: bobpw
+
+dn: uid=carol,ou=people,dc=example,dc=com
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: carol
+cn: Carol Anderson
+sn: Anderson
+mail: carol@example.com
+userPassword: carolpw
+
+dn: cn=developers,ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: developers
+member: uid=alice,ou=people,dc=example,dc=com
+member: uid=bob,ou=people,dc=example,dc=com
+
+dn: cn=admins,ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: admins
+member: uid=alice,ou=people,dc=example,dc=com
